@@ -1,0 +1,494 @@
+% For more powerful document formatting
+\documentclass[12pt,article,oneside,onecolumn,final,a4paper]{memoir}
+
+% For more powerful command and environment definition
+\usepackage{xparse}
+
+% titling content
+\NewDocumentCommand{\modname}{}{CS4248}
+\NewDocumentCommand{\assignname}{}{Assignment 2 Report}
+\NewDocumentCommand{\datename}{}{\today}
+
+% For color customization and drawing
+\usepackage{xcolor}
+\usepackage{pagecolor}
+\usepackage{framed}
+\usepackage{pstricks}
+
+\definecolor{tnbg}{HTML}{FFFFFF}
+\definecolor{tncl}{HTML}{EFEFEF}
+\definecolor{tnse}{HTML}{D6D6D6}
+\definecolor{tnfg}{HTML}{4D4D4C}
+\definecolor{tnco}{HTML}{8E908C}
+\definecolor{tnre}{HTML}{C82829}
+\definecolor{tnor}{HTML}{F5871F}
+\definecolor{tnye}{HTML}{EAB700}
+\definecolor{tngr}{HTML}{718C00}
+\definecolor{tnaq}{HTML}{3E999F}
+\definecolor{tnbl}{HTML}{4271AE}
+\definecolor{tnpu}{HTML}{8959A8}
+
+% For math support
+\usepackage{amsmath,amssymb}
+\usepackage[amsmath,framed,hyperref,thmmarks]{ntheorem}
+
+% Fix \left \right
+\usepackage{mleftright}
+
+% For OpenType typographic support
+\usepackage{fontspec}
+\usepackage{realscripts}
+\usepackage{unicode-math}
+\usepackage[final]{microtype}
+
+% Using Chivo for display text, Cochineal for body, and Pagella for
+% math c.f. fontspec and unicode-math
+\setmainfont{texgyretermes}[
+Extension = .otf,
+UprightFont = *-regular,
+ItalicFont = *-italic,
+BoldFont = *-bold,
+BoldItalicFont = *-bolditalic,
+Ligatures = TeX
+]
+\setmathfont{texgyretermes-math.otf}[Scale=MatchLowercase]
+\setmathfontface\mathit{texgyretermes-italic.otf}[Scale=MatchLowercase]
+\setmathfontface\mathbf{texgyretermes-bold.otf}[Scale=MatchLowercase]
+\newfontfamily\chivo{Chivo}[
+Extension = .otf,
+UprightFont = *-Regular,
+ItalicFont = *-Italic,
+BoldFont = *-Bold,
+BoldItalicFont = *-BoldItalic,
+Ligatures = TeX
+]
+\newfontfamily\chivobold{Chivo}[
+Extension = .otf,
+UprightFont = *-Bold,
+ItalicFont = *-BoldItalic,
+BoldFont = *-Black,
+BoldItalicFont = *-BlackItalic,
+Ligatures = TeX
+]
+\newfontfamily\chivolight{Chivo}[
+Extension = .otf,
+UprightFont = *-Light,
+ItalicFont = *-LightItalic,
+BoldFont = *-Regular,
+BoldItalicFont = *-Italic,
+Ligatures = TeX
+]
+
+% For formatting itemize and enumerate environments
+\usepackage{enumitem}
+
+% For better tables
+\usepackage{longtable}
+\usepackage{tabu}
+
+% PDF features
+\usepackage[final,unicode,
+colorlinks,
+linkcolor=tnre,
+anchorcolor=tnfg,
+citecolor=tngr,
+filecolor=tnaq,
+menucolor=tnre,
+urlcolor=tnpu
+]{hyperref}
+\usepackage{footnotebackref}
+
+\usepackage{cleveref}
+
+% To mark sections as TODO
+\usepackage[draft]{fixme}
+
+% To show labels
+%\usepackage[inline]{showlabels}
+
+%\pagecolor{tnbg}
+%\color{tnfg}
+
+% define augmented matrices
+\makeatletter
+\renewcommand*\env@matrix[1][*\c@MaxMatrixCols c]{%
+  \hskip -\arraycolsep
+  \let\@ifnextchar\new@ifnextchar
+  \array{#1}}
+\makeatother
+
+% microtype compatibility workaround
+% c.f. https://tex.stackexchange.com/questions/373594/microtype-producing-dozens-of-unknown-slot-number-warnings
+\makeatletter
+\def\MT@is@composite#1#2\relax{%
+  \ifx\\#2\\\else
+    \expandafter\def\expandafter\MT@char\expandafter{\csname\expandafter
+                    \string\csname\MT@encoding\endcsname
+                    \MT@detokenize@n{#1}-\MT@detokenize@n{#2}\endcsname}%
+    % 3 lines added:
+    \ifx\UnicodeEncodingName\@undefined\else
+      \expandafter\expandafter\expandafter\MT@is@uni@comp\MT@char\iffontchar\else\fi\relax
+    \fi
+    \expandafter\expandafter\expandafter\MT@is@letter\MT@char\relax\relax
+    \ifnum\MT@char@ < \z@
+      \ifMT@xunicode
+        \edef\MT@char{\MT@exp@two@c\MT@strip@prefix\meaning\MT@char>\relax}%
+          \expandafter\MT@exp@two@c\expandafter\MT@is@charx\expandafter
+            \MT@char\MT@charxstring\relax\relax\relax\relax\relax
+      \fi
+    \fi
+  \fi
+}
+% new:
+\def\MT@is@uni@comp#1\iffontchar#2\else#3\fi\relax{%
+  \ifx\\#2\\\else\edef\MT@char{\iffontchar#2\fi}\fi
+}
+\makeatother
+\makeatletter
+\newtheoremstyle{myplain}%
+{\item[\hskip\labelsep \theorem@headerfont ##1\ ##2\theorem@separator]}%
+{\item[\hskip\labelsep \theorem@headerfont ##1\
+  ##2]{\theorem@headerfont\ (##3)\theorem@separator\hskip\labelsep}}%
+\newtheoremstyle{nonumbermyplain}%
+{\item[\hskip\labelsep \theorem@headerfont ##1\theorem@separator]}%
+{\item[\hskip\labelsep \theorem@headerfont ##1]{\theorem@headerfont\ (##3)\theorem@separator\hskip\labelsep}}%
+\newtheoremstyle{nonumberproof}%
+{\item[\hskip\labelsep \theorem@headerfont ##1\theorem@separator]}%
+{\item[\hskip\labelsep \theorem@headerfont ##3\theorem@separator]}
+\newtheoremstyle{nonumbersolution}%
+{\item[\hskip\labelsep \theorem@headerfont ##1\theorem@separator]}%
+{\item[\hskip\labelsep \theorem@headerfont\color{tngr} ##3\theorem@separator]
+  \makeatother}
+
+\theoremstyle{myplain}
+\theoremheaderfont{\normalfont\chivo\bfseries}
+\theoremsymbol{\ensuremath{_\Box}}
+\theoremseparator{.}
+\newtheorem{thm}{Theorem}[chapter]
+\newtheorem{cor}[thm]{Corollary}
+\newtheorem{lem}[thm]{Lemma}
+
+\theoremstyle{nonumbermyplain}
+%\newtheorem{prop}{Proposition}
+
+\theoremstyle{myplain}
+\theorembodyfont{\upshape}
+\newtheorem{xca}[thm]{Exercise}
+\newtheorem{exmp}[thm]{Example}
+\newtheorem{defn}[thm]{Definition}
+
+\theoremstyle{nonumbermyplain}
+\newtheorem{rem}[thm]{Remark}
+
+\theoremheaderfont{\normalfont\chivolight%\itshape%
+%\scshape
+}
+\theorembodyfont{\upshape}
+\theoremsymbol{\ensuremath{_\blacksquare}}
+\theoremstyle{nonumberproof}
+\newframedtheorem{prf}{Proof}
+\theoremstyle{nonumbersolution}
+\newframedtheorem{soln}{Solution}
+
+% Customize equation numbering, cf. amsmath
+\renewcommand{\theequation}{\thechapter--\arabic{equation}}
+\numberwithin{equation}{chapter}
+
+% customization of section headers cf. memoir
+
+\counterwithout{section}{chapter}
+
+\setsecnumdepth{subsection}
+
+\RenewDocumentCommand\beforepartskip{}{\null\vskip 50pt}
+\RenewDocumentCommand\afterpartskip{}{\vskip 40pt}
+\RenewDocumentCommand\partnamefont{}{\normalfont\chivolight\Huge}
+\RenewDocumentCommand\partnumfont{}{\normalfont\chivolight\Huge}
+\RenewDocumentCommand\parttitlefont{}{\normalfont\chivolight\bfseries\HUGE}
+\nopartblankpage{}
+
+\chapterstyle{default}
+\RenewDocumentCommand\chapterheadstart{}{\vspace*{30pt}}
+\RenewDocumentCommand\afterchapternum{}{\par\nobreak\vskip 5pt}
+\RenewDocumentCommand\afterchaptertitle{}{\par\nobreak\vskip 10pt}
+\RenewDocumentCommand\chapnamefont{}{\normalfont\chivolight\bfseries\huge}
+\RenewDocumentCommand\chapnumfont{}{\normalfont\chivolight\bfseries\huge}
+\RenewDocumentCommand\chaptitlefont{}{\normalfont\chivobold\Huge\bfseries}
+
+\setsecheadstyle{\normalfont\chivobold\Large}
+\setsubsecheadstyle{\normalfont\chivo\bfseries\large}
+\setsubsubsecheadstyle{\normalfont\chivo\large}
+\setparaheadstyle{\normalfont\chivo\bfseries\large}
+\setsubparaheadstyle{\normalfont\chivo\large}
+
+
+% customization of page styles cf. memoir
+
+\makeheadrule{plain}{\textwidth}{\normalrulethickness}
+
+\makeoddhead{plain}{}{}{}
+\makeevenhead{plain}{}{}{}
+
+\makeoddfoot{plain}{}{\chivolight—\,\thepage\,—}{}
+\makeevenfoot{plain}{}{\chivolight—\,\thepage\,—}{}
+% customization of itemize and enumerate environments cf. enumitem
+\setlist{
+  noitemsep,
+  nosep,
+  font=\normalfont\chivo\bfseries
+}
+
+\setlist[itemize]{
+  label=\textbullet{}
+}
+
+\newlist{alphenum}{enumerate}{4}
+\setlist*[alphenum]{
+  label= (\alph*)
+}
+
+\newlist{romanenum}{enumerate}{4}
+\setlist*[romanenum]{
+  label= (\roman*)
+}
+
+% customization of tabu environments
+\global\tabulinesep=4pt
+
+% customize FiXme labels
+\fxsetup{
+layout={inline},
+}
+
+% redefine FiXme labels to have brackets
+\makeatletter
+\renewcommand*\FXLayoutInline[3]{%
+  {\@fxuseface{inline} (\fxnotename{#1}: \textnormal{#2})}%
+}
+\makeatother
+
+% Cleveref counter names
+\crefname{thm}{thm.}{thms.}
+\crefname{lem}{lem.}{lems.}
+\crefname{prop}{prop.}{props.}
+\crefname{cor}{cor.}{cors.}
+\crefname{defn}{defn.}{defns.}
+\crefname{rem}{rem.}{rems.}
+\crefname{exmp}{exmp.}{exmps.}
+\crefname{xca}{exerc.}{exercs.}
+\crefname{step}{step}{steps}
+\crefname{add}{add.}{adds.}
+\crefname{prf}{proof}{proofs}
+\Crefname{thm}{Theorem}{Theorems}
+\Crefname{lem}{Lemma}{Lemmata}
+\Crefname{prop}{Proposition}{Propositions}
+\Crefname{cor}{Corollary}{Corollaries}
+\Crefname{defn}{Definition}{Definitions}
+\Crefname{rem}{Remark}{Remarks}
+\Crefname{exmp}{Example}{Examples}
+\Crefname{xca}{Exercise}{Exercises}
+\Crefname{step}{Step}{Steps}
+\Crefname{add}{Addendum}{Addenda}
+\Crefname{prf}{Proof}{Proofs}
+
+% SHORTHAND
+
+% text shorthand
+
+\NewDocumentCommand{\nt}{m}{\textbf{#1}}
+
+\NewDocumentCommand{\todo}{O{} g}{\IfNoValueTF{#2}%
+  {\fxnote[#1]{\textbf{TODO}}}%
+  {\fxnote[#1]{\textbf{TODO:} #2}}
+}
+\NewDocumentCommand{\wontfix}{O{} g}{\IfNoValueTF{#2}%
+  {\fxnote[#1]{\textbf{WON'T FIX}}}%
+  {\fxnote[#1]{\textbf{WON'T FIX:} #2}}
+}
+
+% math shorthand
+
+% delimiters
+\NewDocumentCommand{\abs}{m}{\mleft\lvert{#1}\mright\rvert}
+\NewDocumentCommand{\norm}{m}{\mleft\lVert{#1}\mright\rVert}
+\NewDocumentCommand{\fl}{m}{\mleft\lfloor{#1}\mright\rfloor}
+\NewDocumentCommand{\ce}{m}{\mleft\lceil{#1}\mright\rceil}
+\NewDocumentCommand{\p}{m}{\mleft({#1}\mright)}
+\NewDocumentCommand{\ad}{m}{\mleft\langle{#1}\mright\rangle}
+\NewDocumentCommand{\B}{m}{\mleft\{{#1}\mright\}}
+\NewDocumentCommand{\s}{m}{\mleft[{#1}\mright]}
+
+% math operators
+\DeclareMathOperator{\D}{d\!}
+\DeclareMathOperator{\rank}{rank}
+\DeclareMathOperator{\nullity}{nullity}
+\DeclareMathOperator{\rowrank}{row\ rank}
+\DeclareMathOperator{\columnrank}{column\ rank}
+\DeclareMathOperator{\tr}{tr}
+\DeclareMathOperator{\adj}{adj}
+\DeclareMathOperator{\sgn}{sgn}
+
+\NewDocumentCommand{\bbZ}{}{\symbb{Z}}
+
+% decoration shorthand
+\NewDocumentCommand{\conj}{m}{\overline{#1}}
+\NewDocumentCommand{\clos}{m}{\overline{#1}}
+
+% vector shorthand (w as a commonly used vector variable character)
+\NewDocumentCommand{\w}{m}{\symbfup{#1}}
+
+% Use \m to typeset math variables that take up multiple symbols.
+\NewDocumentCommand{\q}{m}{\mathit{#1}}
+
+% divides |
+\NewDocumentCommand{\mdi}{}{\mid}
+\NewDocumentCommand{\nmdi}{}{\nmid}
+
+% Catenation
+\NewDocumentCommand{\cat}{}{\cdot}
+
+% zero word
+\NewDocumentCommand{\ew}{}{\epsilon}
+
+% index sequence
+\NewDocumentCommand{\sei}{s O{1} m}%
+{
+  \IfBooleanTF #1%
+  {\({#2},\dotsc,{#3}\)}%
+  {{#2},\dotsc,{#3}}%
+}
+
+% extensional sequence
+\NewDocumentCommand{\se}{s m O{1} m}%
+{%
+  \IfBooleanTF #1%
+  {\({#2}_{#3},\dotsc,{#2}_{#4}\)}%
+  {{#2}_{#3},\dotsc,{#2}_{#4}}%
+}
+
+\NewDocumentCommand{\makeassignmenttitle}{}{
+  \begin{flushleft}
+    Johannes Choo\\
+    \datename{}
+  \end{flushleft}
+  \rule{\textwidth}{\normalrulethickness}
+}
+
+\begin{document}
+\makeassignmenttitle{}
+
+\setcounter{chapter}{1}
+
+\setcounter{thm}{4}
+
+\section{Extending Kneser-Ney to Closure in Unseen \(N\)-grams}
+
+We build in python2 a HMM tagger employing Interpolated Kneser-Ney
+smoothing as described by Jurafsky and Martin (August 2017 Draft). The
+description given by Jurafsky and Martin is not complete, and notably
+not closed under unobserved tokens and contexts. We extend it to
+closure over unobserved \(N\)-grams with the following probability
+measure defined over words \(w\) with either no context, or a context
+of arbitrary positive length \(c'\w{c}\). We have
+\begin{gather*}
+  P_{KN}\p{w\mid c'\w{c}}=
+  \begin{cases}
+    \frac{\max{\p{c\p{c'\w{c}w}-d,0}}}{S\p{c'\w{c}}}
+    +\lambda\p{c'\w{c}}P_{KN}\p{w\mid\w{c}} &
+    \text{if \(S\p{c'\w{c}}>0\),}\\
+    P_{KN}\p{w\mid\w{c}} &
+    \text{if \(S\p{c'\w{c}}=0\),}\\
+  \end{cases} \\
+  P_{KN}\p{w}=P_{KN}\p{w\mid\epsilon}=
+  \begin{cases}
+    \frac{\max\p{c\p{w}-d,0}}{S\p{\epsilon}}+\lambda\p{\epsilon}\frac{1}{\abs{T}+1}
+    &\text{if \(S\p{\epsilon}>0\),} \\
+    \frac{1}{\abs{T}+1}&\text{if \(S\p{\epsilon}=0\),}
+  \end{cases}
+\end{gather*}
+where we wish to obtain the probability of a token \(w\) after
+observing context \(c'\w{c}\). \(T\) is the (unigram) vocabulary. For
+bigrams, we let \(\w{c}=\epsilon\), the empty tuple of words, in order that
+the context is just a single word \(c'\). \(d\) is a parameter with
+\(0\leq d\leq 1\) of the absolute discount to the \(N\)-gram counts; it is
+to be learned by experimentation. \(S\p{\w{c}}\) is a normalization
+term given by
+\begin{equation*}
+  S\p{\w{c}}=\sum_{w\in T}c\p{\w{c}w},
+\end{equation*}
+including for \(\w{c}=\epsilon\). \(\lambda\) redistributes the discounted probability mass
+uniformly over all observed tuples the size of \(c'\w{c}w\), given by
+\begin{equation*}
+  \lambda\p{\w{c}}=\frac{d}{S\p{c}}\abs{\B{w\in T:c\p{\w{c}w}>0}},
+\end{equation*}
+including for \(\w{c}=\epsilon\). The count \(c\) is defined by
+\begin{equation*}
+  c\p{\w{u}}=
+  \begin{cases}
+    c_t\p{\w{u}}&\text{if \(\abs{\w{u}}=N-1\),} \\
+    \abs{\B{v:c_t\p{v\w{u}}>0}}&\text{if \(\abs{\w{u}}<N-1\).}
+  \end{cases}
+\end{equation*}
+including for \(\w{u}=\epsilon\) where \(c_t\) are the raw observations from
+the training set and \(N\) is the \(N\) of our \(N\)-gram model
+(i.e. the number of atoms).
+
+Our implementation uses a straightforward approach where we compute
+\(c_t\), \(c\), \(T\), \(S\) during training, and compute \(P_{KN}\)
+at the time of query. We slide a window of maximum size \(N\) across
+the training corpus, and for each final token \(w\), we record the
+\(N\) tuples that it generates, from the \(N\)-gram to the unigram. In
+our implementation, we perform smoothing separately for the (hidden)
+Markov chain and for the tag-token emission probabilities. We use
+\(N=2\) for a bigram HMM model.
+
+\section{Implementation of the Viterbi Algorithm}
+
+We implement the Viterbi algorithm in a straightforward translation of
+the description provided by Jurafsky and Martin, with a couple of
+modifications. The computation of the tag transition and the token
+emission probabilities are done in probability masses themselves
+(since we have to add probabilities from different models in KN
+smoothing) but once computed, they are converted and accumulated as
+logprobs.
+
+We make a second modification: we only consider candidate tags for
+which there has been an observed transition from the context tag. This
+slightly reduces the accuracy when the correct tag involves an
+unobserved transition from the current context, but greatly speeds up
+the algorithm and its asymptotic performance if we reasonably assume
+that the (observed) transition matrix from context to tag is sparse.
+
+\section{Training and Running the Tagger}
+
+To train the tagger, run:
+\begin{verbatim}
+python2 build_tagger.py sents.train sents.devt model_file
+\end{verbatim}
+
+To run the tagger on a test file, run:
+\begin{verbatim}
+python2 run_tagger.py sents.test model_file sents.out
+\end{verbatim}
+
+In both cases, the \texttt{HMMTagger.py} file should be present in the
+same directory as the script file (\texttt{build\_tagger.py} or
+\texttt{run\_tagger.py}).
+
+\section{References}
+
+\begin{description}
+\item Daniel Jurafsky and James H. Martin.
+  2017. \textit{Speech and Language Processing (3rd Edition,
+    August Draft).} [online] Available at
+  https://web.stanford.edu/\textasciitilde jurafsky/slp3/ [Accessed 28 Sep.\
+  2017].
+\end{description}
+
+\end{document}
+
+%%% Local Variables:
+%%% mode: latex
+%%% TeX-engine: luatex
+%%% TeX-master: t
+%%% End:
